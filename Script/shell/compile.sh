@@ -1,8 +1,12 @@
-#!/bin/bash
-# Bash Menu Script Example
+#!/usr/bin/env bash
+
+
+# 获取脚本路经
+SHELL_PATH=$(dirname "$0")
+SHELL_NAME=$(basename "$0")
 
 # shellcheck disable=SC1091
-source hawaii.sh
+source "$SHELL_PATH"/hawaii.sh
 
 PS3='Please enter your choice: '
 options=(
