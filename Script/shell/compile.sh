@@ -19,11 +19,12 @@ options=(
     "Quit"
 )
 echo "$PS3"
+echo "$1"
 select opt in "${options[@]}"; do
     case $opt in
     "hawaii")
         echo "you chose choice hawaii"
-        hawaii
+        hawaii "$1"
         break
         ;;
     "aruba")
