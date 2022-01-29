@@ -2,31 +2,33 @@
 
 HAWAII_HOME="/home/zl/work/source/hawaii"
 ENVSETUP_FILE="build/envsetup.sh"
+LOG_HOME="log"
+BUILD_TYPE="userdebug"
 
 function make_compile() {
-    echo "$THIS_BUILD_COMPILE_TARGET"
+    echo "/*****make compile******/"
+    echo ${HAWAII_HOME}/${LOG_HOME}/"${THIS_BUILD_COMPILE_TARGET}"-"${BUILD_TYPE}"-gms_"$(date +%Y%m%d_%H%M)"
 
-    # shellcheck disable=SC1090
-    source "$HAWAII_HOME/$ENVSETUP_FILE"
-    lunch "${THIS_BUILD_COMPILE_TARGET}"-userdebug-gms
-    cp vendor/sprd/release/IDH/"${THIS_BUILD_COMPILE_TARGET}"-userdebug-gms/* . -avf
-    time make -j 16 2>&1 | tee -a ${HAWAII_HOME}/log/"${THIS_BUILD_COMPILE_TARGET}"-userdebug-gms_"$(date +%Y%m%d_%H%M)".log
+    cp vendor/sprd/release/IDH/"${THIS_BUILD_COMPILE_TARGET}"-"${BUILD_TYPE}"-gms/* . -avf
+    time make -j 16 2>&1 | tee -a ${HAWAII_HOME}/${LOG_HOME}/"${THIS_BUILD_COMPILE_TARGET}"-"${BUILD_TYPE}"-gms_"$(date +%Y%m%d_%H%M)".log
 }
 
 function make_source() {
     echo "/*****make source******/"
-    echo "$HAWAII_HOME/$ENVSETUP_FILE"
+
     if [ -e "$HAWAII_HOME/$ENVSETUP_FILE" ]; then
         # shellcheck disable=SC1090
         source "$HAWAII_HOME/$ENVSETUP_FILE"
         # source "${ENVSETUP_FILE}"
-        lunch "${THIS_BUILD_COMPILE_TARGET}"-userdebug-gms
+        lunch "${THIS_BUILD_COMPILE_TARGET}"-"${BUILD_TYPE}"-gms
     else
         echo "$ENVSETUP_FILE  not found"
     fi
 }
 
-function make_mmm () {
+function make_mmm() {
+    echo "/*****make mmm******/"
+
     make_source
     mmm "$1"
     # echo "$1"
@@ -40,10 +42,15 @@ function make_pac() {
 
 function hawaii() {
     echo "/********hawaii********/"
+
     cd $HAWAII_HOME || {
         echo "cd $HAWAII_HOME Failure"
         exit 1
     }
+
+    if [ ! -d $LOG_HOME ]; then
+        mkdir -p $LOG_HOME
+    fi
 
     options=(
         "ums9230_4h10_Natv_nv"
@@ -55,12 +62,14 @@ function hawaii() {
         case $opt in
         "ums9230_4h10_Natv_nv")
             THIS_BUILD_COMPILE_TARGET=ums9230_4h10_Natv_nv
+            make_source
             make_compile
             break
             ;;
         "ums9230_4h10_Natv_nv and pac")
             echo "ums9230_4h10_Natv_nv and pac"
             THIS_BUILD_COMPILE_TARGET=ums9230_4h10_Natv_nv
+            make_source
             make_compile
             make_pac
             break
@@ -79,4 +88,5 @@ function hawaii() {
     done
 }
 
-# hawaii
+# For test
+# hawaii 1
